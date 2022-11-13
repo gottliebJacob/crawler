@@ -1,0 +1,7 @@
+{
+  "type": "module",
+  "dependencies": {
+    "cheerio": "*",
+    "node-fetch": "^3.3.0"
+  }
+}
