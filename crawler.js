@@ -21,7 +21,7 @@ const fixUrl = (url, link) => {
 
 const crawl = async (url, depth) => {
     try {
-        if (!alreadyVisited[url]) {
+        if (url && !alreadyVisited[url]) {
 
             alreadyVisited[url] = true;
 
