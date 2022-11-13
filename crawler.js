@@ -1,9 +1,9 @@
 import fs from 'fs';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import https from 'https';
 
 const results = [];
+const alreadyVisited = {};
 
 const re = new RegExp('^(?:[a-z+]+:)?//', 'i');
 
@@ -21,27 +21,29 @@ const fixUrl = (url, link) => {
 
 const crawl = async (url, depth) => {
     try {
-        const agent = new https.Agent({
-            rejectUnauthorized: false
-        });
-        const response = await axios.get(url, { httpsAgent: agent });
+        if (!alreadyVisited[url]) {
 
-        if (response.status === 200) {
+            alreadyVisited[url] = true;
 
-            const $ = cheerio.load(response.data);
+            const response = await axios.get(url);
 
-            $('img').each((_, img) => {
-                results.push({
-                    imageUrl: fixUrl(url, img.attribs.src),
-                    sourceUrl: url,
-                    depth
-                })
-            });
+            if (response.status === 200) {
 
-            if (depth < process.argv[3]) {
-                const links = $('a').toArray();
-                for (let link of links) {
-                    await crawl(fixUrl(url, link.attribs.href), depth + 1);
+                const $ = cheerio.load(response.data);
+
+                $('img').each((_, img) => {
+                    results.push({
+                        imageUrl: fixUrl(url, img.attribs.src),
+                        sourceUrl: url,
+                        depth
+                    })
+                });
+
+                if (depth < process.argv[3]) {
+                    const links = $('a').toArray();
+                    for (let link of links) {
+                        await crawl(fixUrl(url, link.attribs.href), depth + 1);
+                    }
                 }
             }
         }
