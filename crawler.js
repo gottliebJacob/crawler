@@ -8,14 +8,19 @@ const alreadyVisited = {};
 const re = new RegExp('^(?:[a-z+]+:)?//', 'i');
 
 const fixUrl = (url, link) => {
+
+    const urlObj = new URL(url);
+
     if (!link) {
         return '';
+    } else if (link.startsWith('//')) {
+        return `${urlObj.protocol}${link}`
     } else if (re.test(link)) {
         return link;
     } else if (link.startsWith('/') || link.startsWith('#')) {
-        return `${new URL(url).origin}${link}`;
+        return `${urlObj.origin}${link}`;
     } else {
-        return `${new URL(url).origin}/${link}`;
+        return `${urlObj.origin}/${link}`;
     }
 }
 
