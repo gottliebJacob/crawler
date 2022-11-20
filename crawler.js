@@ -44,6 +44,19 @@ const crawl = async (url, depth) => {
                     })
                 });
 
+                $('*').each((_, ele) => {
+                    if (ele.attribs.style?.indexOf('background-image') > -1) {
+                        const [_, imageUrl] = ele.attribs.style.split(';').find(p => p.indexOf('background-image') > -1).split(': ');
+                        results.push({
+                            imageUrl: fixUrl(url, imageUrl.slice(4, imageUrl.length - 1)),
+                            sourceUrl: url,
+                            depth
+                        })
+
+
+                    }
+                })
+
                 if (depth < process.argv[3]) {
                     const links = $('a').toArray();
                     for (let link of links) {
